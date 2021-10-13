@@ -34,7 +34,7 @@
         {#each data as row, i}
           <tr>
             <td>
-              <Checkbox name="row" radio color="blue" />
+              <Checkbox name="row" />
             </td>
             {#each row as cell}
               <td>{cell}</td>

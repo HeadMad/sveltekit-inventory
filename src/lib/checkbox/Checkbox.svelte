@@ -15,29 +15,30 @@
   let control;
 </script>
 
-<input
-  bind:this={control}
-  on:change
-  {...$$restProps}
-  {disabled}
-  {checked}
-  {type}
-/>
-<span
-  {style}
-  {tabindex}
-  on:click={() => control.click()}
-  on:click
-  on:focus
-  class="material-icons"
-  class:disabled
-/>
+
+<label>
+  <input
+    on:change
+    on:click
+
+    {...$$restProps}
+
+    {disabled}
+    {checked}
+    {type}
+    hidden
+  />
+  <span
+    {style}
+    {tabindex}
+    on:focus
+    class="material-icons"
+    class:disabled
+    class:radio
+  />
+</label>
 
 <style>
-  input {
-    display: none;
-  }
-
   span {
     cursor: pointer;
   }
@@ -54,11 +55,11 @@
     content: "check_box";
   }
 
-  input[type="radio"] + span:before {
+  input + .radio:before {
     content: "radio_button_unchecked";
   }
 
-  input[type="radio"]:checked + span:before {
+  input:checked + .radio:before {
     content: "radio_button_checked";
   }
 </style>
