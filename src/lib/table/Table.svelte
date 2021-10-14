@@ -1,14 +1,12 @@
 <script>
-  import Icon from '$lib/icon/Icon.svelte';
-  import Checkbox from '$lib/checkbox/Checkbox.svelte';
+  import Icon from "$lib/icon/Icon.svelte";
+  import Checkbox from "$lib/checkbox/Checkbox.svelte";
+  import Popup from "$lib/popup/Popup.svelte";
 
   export let data = [];
   export let head = [];
 
-
   let checkCount = 0;
-
-  
 </script>
 
 <div class="table">
@@ -19,34 +17,38 @@
         <Checkbox checked disabled />
       </div>
       {#each head as th, i}
-      <div class="table__th">
-        {th}
-      </div>
+        <div class="table__th">
+          <span class="table__th-text">{th}</span>
+        </div>
       {/each}
       <div class="table__th table__th_more">
-        <Icon>more_vert</Icon> 
+        <Popup position="top">
+          <Icon size="1.5em">more_vert</Icon>
+          <ul slot="data">
+            <li>Снять выделение</li>
+            <li>Удалить выделенные</li>
+          </ul>
+        </Popup>
       </div>
     </div>
   {/if}
-  <div class="table__data">
-    {#if data.length}
-      <table>
-        {#each data as row, i}
-          <tr>
-            <td>
-              <Checkbox name="row" />
-            </td>
-            {#each row as cell}
-              <td>{cell}</td>
-            {/each}
-            <td>
-              <Icon>more_vert</Icon>                
-            </td>
-          </tr>
-        {/each}
-      </table>
-    {/if}
-  </div>
+  {#if data.length}
+    <div class="table__data">
+      {#each data as row, i}
+        <div class="table__row">
+          <div class="table__cell table__row-check">
+            <Checkbox name="row" size="1.5em" />
+          </div>
+          {#each row as cell}
+            <div class="table__cell">{cell}</div>
+          {/each}
+          <div class="table__cell table__row-opt">
+              <Icon size="1.5em">more_vert</Icon>
+          </div>
+        </div>
+      {/each}
+    </div>
+  {/if}
   <slot name="footer" />
 </div>
 
@@ -68,30 +70,39 @@
   }
 
   .table__th {
-    font-family: 'Ubuntu', sans-serif;
     display: table-cell;
     vertical-align: middle;
+    padding: 0 20px;
+  }
+  
+  .table__th-text {
+    font-family: "Ubuntu", sans-serif;
     font-weight: 600;
     letter-spacing: 0.05em;
-    padding: 0 20px;
     text-transform: uppercase;
     font-size: 11px;
+    
   }
 
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  tr {
+  
+  .table__row {
     border-top: 1px solid #d9d5ec;
+    display: flex;
   }
 
-  td {
-    height: 60px;
-    padding: 0 20px;
+  .table__cell {
+    flex-grow: 1;
+    line-height: 4.5em;
+    padding: 0 1em;
     font-weight: 400;
-    font-size: 14px;
+    font-size: 0.75rem;
     color: #25213b;
+  }
+
+  .table__row-check,
+  .table__row-opt {
+    flex-grow: 0;
+    width: 1.5em;
+    text-align: center;
   }
 </style>

@@ -41,6 +41,7 @@
 <style>
   span {
     cursor: pointer;
+    vertical-align: middle;
   }
 
   .disabled {
