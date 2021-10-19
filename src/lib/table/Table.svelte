@@ -10,39 +10,41 @@
 </script>
 
 <div class="table">
-  <slot name="header" />
-  {#if head.length}
-    <div class="table__title">
-      <div class="table__th table__th_checkbox">
-        <Checkbox checked disabled />
-      </div>
-      {#each head as th, i}
-        <div class="table__th">
-          <span class="table__th-text">{th}</span>
+  <div class="table__head">
+    <slot name="header" />
+    {#if head.length}
+      <div class="table__row">
+        <div class="table__cell table__cell_check">
+          <Checkbox checked disabled />
         </div>
-      {/each}
-      <div class="table__th table__th_more">
-        <Popup position="top">
-          <Icon size="1.5em">more_vert</Icon>
-          <ul slot="data">
-            <li>Снять выделение</li>
-            <li>Удалить выделенные</li>
-          </ul>
-        </Popup>
+        {#each head as th, i}
+          <div class="table__cell">
+            {th}
+          </div>
+        {/each}
+        <div class="table__cell table__cell_opt">
+          <Popup>
+            <Icon size="1.5em">more_vert</Icon>
+            <ul slot="data">
+              <li>Снять выделение</li>
+              <li>Удалить выделенные</li>
+            </ul>
+          </Popup>
+        </div>
       </div>
-    </div>
-  {/if}
+    {/if}
+  </div>
   {#if data.length}
-    <div class="table__data">
+    <div class="table__body">
       {#each data as row, i}
         <div class="table__row">
-          <div class="table__cell table__row-check">
+          <div class="table__cell table__cell_check">
             <Checkbox name="row" size="1.5em" />
           </div>
           {#each row as cell}
             <div class="table__cell">{cell}</div>
           {/each}
-          <div class="table__cell table__row-opt">
+          <div class="table__cell table__cell_opt">
               <Icon size="1.5em">more_vert</Icon>
           </div>
         </div>
@@ -62,27 +64,20 @@
     border-collapse: collapse;
   }
 
-  .table__title {
-    display: table;
+  .table__head > .table__row {
     height: 40px;
     background: #f4f2ff;
     width: 100%;
   }
-
-  .table__th {
-    display: table-cell;
-    vertical-align: middle;
-    padding: 0 20px;
-  }
   
-  .table__th-text {
+  /* .table__row_title > .table__cell {
     font-family: "Ubuntu", sans-serif;
     font-weight: 600;
     letter-spacing: 0.05em;
     text-transform: uppercase;
     font-size: 11px;
     
-  }
+  } */
 
   
   .table__row {
@@ -99,8 +94,8 @@
     color: #25213b;
   }
 
-  .table__row-check,
-  .table__row-opt {
+  .table__cell_check,
+  .table__cell_opt {
     flex-grow: 0;
     width: 1.5em;
     text-align: center;
