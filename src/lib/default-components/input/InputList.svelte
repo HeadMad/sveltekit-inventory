@@ -2,10 +2,9 @@
   import { getContext, createEventDispatcher } from "svelte";
   import { createEventActions } from './listEventActions.js';
 
-  export let items = [];
-  export let keyActions = {};
+  let items = [];
+  let keyActions = {};
 
-  
   let selected = -1;
   let focused = -1;
   let visible = true;
@@ -60,6 +59,11 @@
         actionResponse(dispatch);
     }
   });
+
+  export {
+    items,
+    keyActions
+  };
 </script>
 
 
@@ -116,13 +120,13 @@ class:input__list_visible={visible}
 
   .input__item_focused,
   .input__item:hover {
-    background: var(--light);
-    color: var(--dark);
+    background: var(--light, #eee);
+    color: var(--dark, #222);
   }
 
   .input__item_selected,
   .input__item_selected:hover {
-    background: var(--dark);
+    background: var(--dark, #222);
     color: #fff;
   }
 </style>

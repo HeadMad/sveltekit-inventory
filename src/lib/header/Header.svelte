@@ -12,7 +12,7 @@ import { title } from '$lib/store.js';
     },
     {
       text: 'Катологи',
-      href: '/catalogs'
+      href: '/catalog'
     },
     {
       text: 'Ревизия',

@@ -1,4 +1,4 @@
-import keyActions from './defaultListKeyActions.js';
+import keyActions from './listDefaultKeyActions.js';
 
 
 export const createEventActions = (list, userKeyActions) => {

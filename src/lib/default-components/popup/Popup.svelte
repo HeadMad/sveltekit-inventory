@@ -140,20 +140,4 @@
     border-right-color: #fff;
   }
 
-  .popup__list > :global(ul) {
-    list-style: none;
-    padding: 0.25em;
-    margin: 0;
-  }
-  .popup__list > :global(ul > li) {
-    font-size: 0.75rem;
-    line-height: 1.5em;
-    white-space: nowrap;
-    padding: 0.25em 0.75em;
-    cursor: pointer;
-    color: #888;
-  }
-  .popup__list > :global(ul > li):hover {
-    background-color: #eee;
-  }
 </style>

@@ -1,6 +1,6 @@
 <script>
-  import Input from '../Input/Input.svelte';
-  import InputList from '../Input/InputList.svelte';
+  import Input from '../input/Input.svelte';
+  import InputList from '../input/InputList.svelte';
   import keyActions from './userKeyActions.js';
 
   export let value = '';

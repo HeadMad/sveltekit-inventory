@@ -39,7 +39,8 @@
 /* font-family: Roboto, "Segoe UI", "Open Sans", "Helvetica Neue",  BlinkMacSystemFont, Oxygen, Ubuntu, Arial, -apple-system, Cantarell, sans-serif; */
   line-height: 24px;
   font-size: 16px;
-  font-family: 'Roboto', sans-serif;
+  /* font-family: 'Roboto', sans-serif; */
+  font-family: 'Open Sans', sans-serif;
 
   --font-mono: "Fira Mono", monospace;
   --pure-white: #ffffff;
@@ -47,9 +48,9 @@
   --secondary-color: #d8c3a5;
   --tertiary-color: #c6c2de;
   --accent-color: #e85a4f;
-  --heading-color: rgba(0, 0, 0, 0.7);
+  --heading-color: #1f2025;
   --text-color: #6e6893;
-  --background-without-opacity: rgba(255, 255, 255, 0.7);
+  --background-without-opacity: #ffffff;
 }
 
 body {
@@ -60,12 +61,8 @@ body {
 }
 
 #svelte {
-  min-height: 100vh;
-  max-width: 1100px;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  padding: 0 48px;
+  height: 100vh;
+  
 }
 
 [hidden] {
@@ -74,18 +71,14 @@ body {
 
 h1, h2, h3 {
   font-family: 'Ubuntu', sans-serif;
+  font-weight: 500;
 }
 
-h1,
-h2,
 p {
-  font-weight: 400;
   color: var(--heading-color);
-}
-
-p {
   line-height: 1.5;
 }
+
 
 a {
   color: var(--accent-color);
@@ -117,6 +110,7 @@ pre {
 
 input,
 button {
+  height: 2em;
   font-size: inherit;
   font-family: inherit;
 }
@@ -125,6 +119,9 @@ button:focus:not(:focus-visible) {
   outline: none;
 }
 
+button {
+  cursor: pointer;
+}
 
 .material-icons {
   -webkit-touch-callout: none;

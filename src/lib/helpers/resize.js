@@ -7,7 +7,7 @@ const  resizeObserver = new ResizeObserver(entries => {
 
 export default function resize (resizer, callback) {
   if (typeof callback !== 'function')
-    return console.warn('PLEASE SET CALLBACK FUNCTION IN USE:RESIZE')
+    return console.warn('Please set callback function in use:resize')
   handlers.set(resizer, callback);
   resizeObserver.observe(resizer);
 

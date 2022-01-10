@@ -1,9 +1,9 @@
 <script>
-  import {setContext} from 'svelte';
+  import { setContext } from 'svelte';
   import { writable } from 'svelte/store';
   
-  export let label = '';
-  export let value = '';
+  let label = '';
+  let value = '';
 
   const state = writable({type: 'init'});
   setContext('input-state', state);
@@ -14,11 +14,17 @@
   
   let control;
 
-  export const focus = () => control.focus();
-  export const blur = () => control.blur();
+  const focus = () => control.focus();
+  const blur = () => control.blur();
   
   const changeState = (event) => $state = {type: event.type, event};
 
+  export {
+    value,
+    label,
+    focus,
+    blur
+  }
 </script>
 
 <label
@@ -46,9 +52,9 @@ class="input{ $$restProps.class ? ' ' + $$restProps.class : '' }"
   
   {#if label}
   <span
-  class="input__label"
-  class:input__label_top={ value }
-  >{label}</span>
+    class="input__label"
+    class:input__label_top={ value }
+  >{ label }</span>
   {/if}
   <slot />
 </label>
@@ -59,10 +65,18 @@ class="input{ $$restProps.class ? ' ' + $$restProps.class : '' }"
     display: inline-block;
     padding:  1.2em 0 0;
   }
-
+  
   .input__control {
+    box-sizing: border-box;
     width: 100%;
+    height: 2em;
+    padding: 0 .4em;
     margin: 0;
+  }
+  
+  .input__control:focus {
+    position: relative;
+    z-index: 1;
   }
 
   .input__label {

@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher, onMount } from 'svelte';
   const dispatch = createEventDispatcher();
-  export let accept = ".";
+  let accept = ".";
   let control;
   let state = 'none';
   let files = [];
@@ -21,8 +21,8 @@
   function onDrop(event) {
     event.preventDefault();
     state = 'drop';
-    files = event.dataTransfer.files;
-    dispatch('change', {files});
+    files = files.concat([...event.dataTransfer.files]);
+    dispatch('change', { files });
   }
 
   function dragEnter() {
@@ -33,7 +33,7 @@
   }
 
   function onChange() {
-    files = this.files;
+    files = files.concat([...this.files]);
     dispatch('change', {files});
   }
 
@@ -41,9 +41,13 @@
     control.click();
   }
 
+  export {
+    accept
+  }
   
 </script>
 
+<slot {state} {files}/>
 <div
 class="uploader"
 
@@ -54,7 +58,7 @@ on:drop
 on:dragenter={dragEnter}
 on:dragleave={dragLeave}
 >
-  <slot {state}>
+  <slot name="dropzone">
     <div class="uploader__dropzone uploader__dropzone_state_{state}">
 
       <ul class="uploader__items">
@@ -78,7 +82,6 @@ on:dragleave={dragLeave}
 
 <style>
   .uploader {
-    display: contents;
   }
 
   .uploader__control {

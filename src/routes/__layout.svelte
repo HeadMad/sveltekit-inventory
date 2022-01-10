@@ -1,31 +1,35 @@
 <script context="module">
-  export function load ({page}) {
+  export function load({ page }) {
     return {
       props: {
-        page: page.path
-      }
-    }
+        page: page.path,
+      },
+    };
   }
 </script>
 
 <script>
   import "../app.css";
-  import Header from '$lib/header/Header.svelte';
-
-  export let page = '/';
-
-
-
+  import { title } from "$lib/store.js";
+  import { click, path } from "svelte-pathfinder";
+  import Sidebar from "$lib/sidebar/Sidebar.svelte";
+  
 </script>
-<Header {page}/>
+
+<!-- <svelte:window on:click={click} /> -->
+<svelte:head>
+  <title>{$title}</title>
+</svelte:head>
 
 <main><slot /></main>
-<footer>Footer Information</footer>
+<Sidebar />
+
 
 <style>
-  
 
   main {
-    flex-grow: 1;
+    padding: 0 3.5rem;
+    margin: auto;
+    min-height: 100%;
   }
 </style>
