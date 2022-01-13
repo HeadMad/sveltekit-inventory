@@ -12,8 +12,9 @@
   import "../app.css";
   import { title } from "$lib/store.js";
   import { click, path } from "svelte-pathfinder";
-  import Sidebar from "$lib/sidebar/Sidebar.svelte";
-  
+  import Header from "$lib/components/custom/header/Header.svelte";
+  let page;
+  export { page };
 </script>
 
 <!-- <svelte:window on:click={click} /> -->
@@ -21,15 +22,12 @@
   <title>{$title}</title>
 </svelte:head>
 
-<main><slot /></main>
-<Sidebar />
+<Header {page} />
 
+<main><slot names={"NMAE"} /></main>
 
 <style>
-
   main {
-    padding: 0 3.5rem;
-    margin: auto;
-    min-height: 100%;
+    padding: 0 2rem;
   }
 </style>

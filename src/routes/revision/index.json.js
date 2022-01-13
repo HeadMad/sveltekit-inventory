@@ -1,4 +1,4 @@
-import db from '$lib/db/sqlite';
+import db from '$lib/sqlite/db';
 
 const sql = `CREATETABLE table2 (
   id INT PRIMARY KEY AUTOINCREMENT NOT NULL,

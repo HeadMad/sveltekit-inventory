@@ -1,7 +1,7 @@
 <script>
-  import Input from "$lib/default-components/input/Input.svelte";
-  import Select from "$lib/default-components/select/Select.svelte";
-import { is_client } from "svelte/internal";
+  import Input from "$lib/components/default/input_old/Input.svelte";
+  import Select from "$lib/components/default/select/Select.svelte";
+  
   let tableName = "sem";
   const columns = [
     {
