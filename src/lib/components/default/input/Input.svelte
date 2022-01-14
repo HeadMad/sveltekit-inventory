@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  let items = [];
+  let list = [];
   let focused = -1;
   let selected = -1;
   let visible = false;
@@ -9,44 +9,58 @@
   let value;
   let input;
 
-  $: selectValue = items[focused];
-  $: selected = items.indexOf(value);
-  $: listSize = Math.max(2, Math.min(spread, items.length));
+  $: selectValue = list[focused];
+  $: {
+    selected = list.indexOf(value);
+    focused = list.indexOf(value);
+  }
+  $: listSize = Math.max(2, Math.min(spread, list.length));
 
   const dispatch = createEventDispatcher();
 
-  const inputArrowAction = (add) => () => {
-    const ind = focused + add === -2 ? 1 : 0;
-    focused = (items.length + focused + add + ind) % items.length;
+  function select(newValue) {
+    value = newValue;
+    visible = false;
+    dispatch("select", selectValue);
+  }
+
+  const inputArrowAction = (add) => (event) => {
+    const len = list.length;
+    console.log('before:', focused);
+    if (focused >= len) focused = 0;
+    else if (focused === -1) focused = add === 1 ? 0 : len - 1;
+    else focused = (len + focused + add) % len;
+    console.log('after:', focused);
     visible = true;
+    event.preventDefault();
   };
 
   const inputKeydownHandlers = {
     ArrowUp: inputArrowAction(-1),
     ArrowDown: inputArrowAction(1),
-    Escape() { visible = false },
-    Tab() { visible = false },
+    Escape() {
+      visible = false;
+    },
+    Tab() {
+      visible = false;
+    },
     Enter() {
       if (visible && selectValue) {
-        value = selectValue;
-        dispatch('select', selectValue);
-        visible = false;
+        select(selectValue);
       } else {
-        dispatch('enter');
+        dispatch("enter");
       }
-    }
+    },
   };
 
   function onInputKeydown(event) {
     if (event.code in inputKeydownHandlers)
-      inputKeydownHandlers[event.code]();
+      inputKeydownHandlers[event.code](event);
   }
 
   function selectClick(event) {
-    value = event.target.value;
-    dispatch('select', event.target.value);
+    select(event.target.value);
     input.focus();
-    visible = false;
   }
 
   function onBodyclick(event) {
@@ -59,26 +73,51 @@
     visible = false;
   }
 
-  export { items, value, spread };
+  export { list, value, spread, input as ref };
 </script>
 
 <svelte:body on:click={onBodyclick} />
 
-<label class={$$restProps.class}>
-  {#if items.length}
+<div
+class="input{$$restProps.class ? ' ' + $$restProps.class : ''}"
+>
+  <slot name="before" />
+  <label
+    class:list={list.length}
+    class:visible
+    class="input__label"
+  >
+    <input
+      type="text"
+      {...$$restProps}
+      class="input__controll"
+
+      bind:this={input}
+      bind:value
+
+      on:click={() => (visible = !visible)}
+      on:keydown={onInputKeydown}
+      on:input
+      on:click
+
+    />
+</label>
+  {#if list.length}
     <select
+      class="input__list"
+      tabindex="-1"
+      size={listSize}
+
       class:visible
-      class:scrolling={listSize < items.length}
+      class:scrolling={listSize < list.length}
 
       bind:value={selectValue}
 
       on:focus={input.focus}
       on:click={selectClick}
-
-      tabindex="-1"
-      size={listSize}
+      
     >
-      {#each items as opt, i}
+      {#each list as opt, i}
         <option
           class:selected={selected === i}
           class:focused={focused === i}
@@ -87,53 +126,69 @@
       {/each}
     </select>
   {/if}
-  <input
-    type="text"
-
-    {...$$restProps}
-
-    bind:this={input}
-    bind:value
-
-    on:click={() => (visible = !visible)}
-    on:keydown={onInputKeydown}
-    class="input"
-  />
-</label>
+  <slot name="after" />
+  </div>
 
 <style>
-  label {
+  .input {
     position: relative;
+    display: inline-block;
   }
-
-  input {
+  
+  .input__label {
+    position: relative;
+    display: block;
+  }
+  
+  .list::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    margin: auto auto auto -1.25em;
+    width: 0;
+    height: 0;
+    border: 4px solid transparent;
+    border-top-color: #000;
+    border-bottom-width: 0;
+  }
+  
+  .list.visible::after {
+    opacity: 0.3;
+  }
+  
+  .list > input {
+    padding-right: 1.5em;
+  }
+  
+  .input__controll {
     width: 100%;
     box-sizing: border-box;
     padding: 0 0.6em;
+    text-overflow: ellipsis;
   }
-
-  input:focus {
+  
+  .input__controll:focus {
     outline: 5px auto Highlight;
     outline: 5px auto -webkit-focus-ring-color;
   }
-
-  select {
+  
+  .input__list {
     position: absolute;
+    z-index: 100;
     top: 100%;
+    left: 0;
+    margin-top: 4px;
     min-width: 100%;
     border-radius: 0;
     border: 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     outline: 0;
     overflow: hidden;
     visibility: hidden;
   }
 
-  select:focus {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  }
-
-  select.visible {
+  .input__list.visible {
     visibility: visible;
   }
 
@@ -146,7 +201,7 @@
   }
 
   .scrolling::-webkit-scrollbar-thumb {
-    background-color: #ddd;
+    background-color: #000;
     border: 1px solid #fff;
   }
 
@@ -156,13 +211,7 @@
     padding: 0.5em 1em;
   }
 
-  option.selected,
-  option.selected:checked::after {
-    background: #000;
-    color: #fff;
-  }
-
-  option:checked::after {
+  option.focused::after {
     content: attr(value);
     padding: inherit;
     position: absolute;
@@ -171,7 +220,13 @@
     bottom: 0;
     right: 0;
     color: #000;
-    background-color: #ddd;
+    background-color: #eee;
+  }
+
+  option.selected,
+  option.selected.focused::after {
+    background: #000;
+    color: #fff;
   }
 
   /* option:hover,

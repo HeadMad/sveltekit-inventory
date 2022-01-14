@@ -11,7 +11,7 @@
 <script>
   import "../app.css";
   import { title } from "$lib/store.js";
-  import { click, path } from "svelte-pathfinder";
+  // import { click, path } from "svelte-pathfinder";
   import Header from "$lib/components/custom/header/Header.svelte";
   let page;
   export { page };

@@ -1,5 +1,5 @@
 <script>
-  import { query, path, fragment } from "svelte-pathfinder";
+  // import { query, path, fragment } from "svelte-pathfinder";
   import Modal from "$lib/components/default/modal/Modal.svelte";
   import Input from "$lib/components/default/input/Input.svelte";
 
@@ -8,49 +8,60 @@
 
   let rows = [];
   let value = '';
-  let input;
+  let ref;
   let searchResults = [];
 
-  // async function onInputSearch(event) {
-  //   if (this.value.length < 3) return searchResults = [];
+  async function onInputSearch(event) {
+    if (this.value.length < 3) return searchResults = [];
 
-  //   const res = await fetch('/search/api?s=' + this.value);
-  //   const result = await res.json();
-  //   console.log(result)
-  //   if (result.ok)
-  //     searchResults = result.result;
-  //   }
+    const res = await fetch('/search/api?s=' + this.value);
+    const result = await res.json();
+    console.log(result)
+    if (result.ok)
+      searchResults = result.result;
+    }
     
-  //   function onListSelect(event) {
-  //     const val = event.detail.value;
-  //     rows = rows.concat(val);
-  //     searchResults = [];
-  //     input.value = '';
-  // }
+    function onListSelect(event) {
+      const val = event.detail;
+      rows = rows.concat(val);
+      // searchResults = [];
+      // value = '';
+  }
  
 </script>
 
 <div class="wrap">
   <section>
     <h1>Инвентаризация товаров</h1>
-    <p>В поле ниже поместите штрихкод или наниет вводить название товара</p>
+    <p>В поле ниже поместите штрихкод или начниет вводить название товара</p>
   </section>
   <div class="controll">
-    <!-- <Input bind:this={input} bind:value label="Штрихкод" class="input_grow_1" on:input={onInputSearch}>
-      <InputList items={searchResults} on:select={onListSelect}/>
-    </Input> -->
     <Input
-    value="me"
-    items={['some time the', 'text same', 'lead', 'and', 'me', 'take']}
-    class="some_class"
-    size="40"
-    on:select={event => console.log(event)}
-    />
+    spread={15}
 
+      bind:value
 
-    <button on:blur={()=> input.focus()}>+1</button>
-  </div>
-  <div class="rows">
+      list={searchResults}
+
+      on:input={onInputSearch}
+      on:select={onListSelect}
+
+      class="input_grow_1"
+      size="40"
+    >
+  <small slot="before">Вставте штрихкод или введите часть названия</small>
+  </Input>
+
+  
+  
+  <button on:blur={()=> ref.focus()}>+1</button>
+</div>
+<div class="rows">
+  <Input list={["some", "name", 123789]}>
+    <small slot="after"><small>Error text</small></small>
+  </Input>
+  
+  
     <table>
       {#each rows as row, i}
         <tr>
@@ -74,6 +85,7 @@
   }
   .controll {
     position: sticky;
+    z-index: 1000;
     top:0;
     width: 100%;
     white-space: nowrap;
@@ -92,8 +104,8 @@
   :global(.input_grow_1) {
     flex-grow: 1;
   }
-  .rows {
-    /* flex-grow: 1; */
-    /* overflow: auto; */
-  }
+  /* .rows {
+    flex-grow: 1;
+    overflow: auto; 
+  } */
 </style>

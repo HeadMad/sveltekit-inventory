@@ -4,16 +4,18 @@
   "scripts": {
     "dev": "svelte-kit dev",
     "build": "svelte-kit build",
+    "package": "svelte-kit package",
     "preview": "svelte-kit preview"
   },
   "devDependencies": {
+    "@sveltejs/adapter-auto": "next",
     "@sveltejs/kit": "next",
-    "svelte": "^3.34.0",
-    "svelte-pathfinder": "^3.3.0"
+    "svelte": "^3.44.0"
   },
   "type": "module",
   "dependencies": {
     "better-sqlite3": "^7.4.6",
-    "svelte-headroom": "^2.2.1"
+    "svelte-headroom": "^2.2.1",
+    "svelte-sheets": "^0.2.2"
   }
 }
