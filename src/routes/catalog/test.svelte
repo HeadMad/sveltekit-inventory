@@ -85,18 +85,26 @@ import XLSX from "xlsx";
         let colspan = cell.colSpan;
 
         // add count of new cells in row counter
-        if (rowspan > 1)
-          while(--rowspan) {
+        // if (rowspan > 1)
+          while(rowspan--) {
             const nr = r + rowspan;
-            const newCell = rows[nr].insertCell(c);
-            newCell.colSpan = colspan;
-            newCell.style.backgroundColo = 'red';
-          }
+            const nc = rowspan ? c - 1 : c;
+            const span = rowspan ? colspan : colspan - 1; 
+            try {
+              rows[nr].cells[nc]
+              .insertAdjacentHTML('afterEnd', Array(span).fill('<td></td>').join(''));
 
-        if (colspan > 1)
-          for (let i = 1; i < colspan; i++) {
-            row.insertCell( c + i );
+              console.log(nr, nc, span)
+
+            } catch (err) {
+              console.log(err.toString())
+              console.log(nr, nc, rows[nr])
+            }
           }
+          
+
+        // if (colspan > 1)
+        //   cell.insertAdjacentHTML('afterEnd', Array(colspan - 1).fill('<td></td>').join(''));
         
           cell.rowSpan = 1;
           cell.colSpan = 1;
@@ -111,9 +119,8 @@ import XLSX from "xlsx";
     selectable = new Selectable({
       filter: '.table td:not(.service)'
     });
-    selectable.on("init", function() {
-      selectable.table(table);
-    });
+    // selectable.on("init", function() {});    
+    selectable.table(table);
     
   }
 

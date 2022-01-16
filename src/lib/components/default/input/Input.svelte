@@ -63,23 +63,29 @@
     input.focus();
   }
 
-  function onBodyclick(event) {
-    if (!visible) return;
-    let target = event.target;
-    while (target) {
-      if (target === input.parentNode) return;
-      target = target.parentNode;
-    }
-    visible = false;
+  function onClickOutside(node) {
+    const handleCheck = (event) => {
+      if (!visible) return;
+      if (!node.contains(event.target))
+        visible = false;
+    };
+
+    document.addEventListener('click', handleCheck);
+    
+    return {
+      destroy() {
+        document.removeEventListener('click', handleCheck, true);
+      }
+    } 
   }
 
   export { list, value, spread, input as ref };
 </script>
 
-<svelte:body on:click={onBodyclick} />
 
 <div
 class="input{$$restProps.class ? ' ' + $$restProps.class : ''}"
+use:onClickOutside
 >
   <slot name="before" />
   <label
