@@ -1,20 +1,3 @@
-<!-- <script context="module">
-  export async function load({fetch }) {
-
-
-    const res = await fetch(
-      `/catalog/api/table?data=${encodeURIComponent(
-        JSON.stringify({ table: 'Майки.html' })
-      )}`
-    );
-    const result = await res.json();
-    if (!result.ok) return console.log(result);
-
-    return {
-      props: { tableData: result.result },
-    };
-  }
-</script> -->
 
 <script>
 import Uploader from "$lib/components/default/uploader/Uploader.svelte";
@@ -25,7 +8,8 @@ import XLSX from "xlsx";
   $: top = $pin ? "39px" : "0";
 
   let showTable = false;
-  let wrap;
+  let tableWrap;
+  let selectable;
 
   async function onChange(event) {
     const { files } = event.detail;
@@ -37,7 +21,7 @@ import XLSX from "xlsx";
 
     const htmlString = await XLSX.utils.sheet_to_html(raw);
     const table = await parseHtmlTable(htmlString);
-    wrap.append(table);
+    tableWrap.append(table);
 
     initSelectable(table);
     showTable = true;
@@ -84,15 +68,55 @@ import XLSX from "xlsx";
     return cell;
   }
 
+  
+
+ 
+
+
+  async function normalizeTable() {
+
+    const table = tableWrap.querySelector('table');
+    const rows = table.tBodies[0].rows;
+  
+    await foreach(rows, async (row, r) =>
+      await foreach(row.cells, (cell, c) => {
+        if (c === 0) return;
+        let rowspan = cell.rowSpan;
+        let colspan = cell.colSpan;
+
+        // add count of new cells in row counter
+        if (rowspan > 1)
+          while(--rowspan) {
+            const nr = r + rowspan;
+            const newCell = rows[nr].insertCell(c);
+            newCell.colSpan = colspan;
+            newCell.style.backgroundColo = 'red';
+          }
+
+        if (colspan > 1)
+          for (let i = 1; i < colspan; i++) {
+            row.insertCell( c + i );
+          }
+        
+          cell.rowSpan = 1;
+          cell.colSpan = 1;
+      })
+    );
+
+    initSelectable(table);
+  }
+
+
   async function initSelectable(table) {
-    let selectable = new Selectable({
-      filter: '.wrapper td:not(.service)'
+    selectable = new Selectable({
+      filter: '.table td:not(.service)'
     });
     selectable.on("init", function() {
       selectable.table(table);
     });
     
   }
+
 
   function foreach(iter, handler) {
     for (let i = 0; i < iter.length; i++) {
@@ -101,57 +125,66 @@ import XLSX from "xlsx";
   }
 
 
+
 </script>
 
+<div class="wrap">
+  {#if showTable}
+    <div class="controll">
+      <button>Удалить</button>
+      <button>Новая таблица</button>
+      <button on:click={normalizeTable}>Нормализовать таблицу</button>
+    </div>
+  {/if}
+  <div class="table" bind:this={tableWrap} />
 
-
-<div class="wrapper" bind:this={wrap}></div>
-
-{#if !showTable}
-<Uploader on:change={onChange}></Uploader>
-{/if}
+  {#if !showTable}
+    <Uploader on:change={onChange} />
+  {/if}
+</div>
 
 <style>
+  .wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+  }
 
-.wrapper :global(thead) {
-  position: sticky;
-  top: 0;
+  .table :global(thead) {
+    position: sticky;
+    top: 0;
+  }
 
-}
+  .table :global(.service.ui-selected),
+  .table :global(.ui-selected) {
+    background-color: rgba(75, 141, 241, 0.048);
+  }
 
-.wrapper :global(.service.ui-selected),
-.wrapper :global(.ui-selected) {
-  background-color: rgba(75, 141, 241, 0.048);
-}
-
-.wrapper :global(table) {
-  border-collapse: collapse;
-  border: 1px solid #000;
-  font-size: 13px;
-}
-.wrapper :global(th),
-.wrapper :global(td) {
-  border: 1px solid #ddd;
-  background: #fff;
-  -webkit-touch-callout: none;
+  .table :global(table) {
+    border-collapse: collapse;
+    border: 1px solid #000;
+    font-size: 13px;
+  }
+  .table :global(th),
+  .table :global(td) {
+    border: 1px solid #ddd;
+    background: #fff;
+    -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-}
-.wrapper :global(td:not(:empty)) {
-  padding: .2em 1em;
-}
+  }
+  .table :global(td:not(:empty)) {
+    padding: 0.2em 1em;
+  }
 
-.wrapper :global(.service) {
-  background-color: #eee;
-  padding: .1em .2em;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 400;
-}
-/* .wrapper :global(table) {} */
-/* .wrapper :global(table) {} */
-
+  .table :global(.service) {
+    background-color: #eee;
+    padding: 0.1em 0.2em;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 400;
+  }
 </style>

@@ -17,6 +17,7 @@
 
 import Selectable from "./selectable.js";
 
+let tableInstance
 
 Selectable.prototype.table = function (table) {
   // version check
