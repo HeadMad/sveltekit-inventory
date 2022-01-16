@@ -10,11 +10,12 @@
   let input;
 
   $: selectValue = list[focused];
+  $: items = [...new Set(list)];
   $: {
-    selected = list.indexOf(value);
-    focused = list.indexOf(value);
+    selected = items.indexOf(value);
+    focused = items.indexOf(value);
   }
-  $: listSize = Math.max(2, Math.min(spread, list.length));
+  $: listSize = Math.max(2, Math.min(spread, items.length));
 
   const dispatch = createEventDispatcher();
 
@@ -25,12 +26,11 @@
   }
 
   const inputArrowAction = (add) => (event) => {
-    const len = list.length;
-    console.log('before:', focused);
+    const len = items.length;
     if (focused >= len) focused = 0;
     else if (focused === -1) focused = add === 1 ? 0 : len - 1;
     else focused = (len + focused + add) % len;
-    console.log('after:', focused);
+    
     visible = true;
     event.preventDefault();
   };
@@ -83,7 +83,7 @@ class="input{$$restProps.class ? ' ' + $$restProps.class : ''}"
 >
   <slot name="before" />
   <label
-    class:list={list.length}
+    class:list={items.length}
     class:visible
     class="input__label"
   >
@@ -102,14 +102,14 @@ class="input{$$restProps.class ? ' ' + $$restProps.class : ''}"
 
     />
 </label>
-  {#if list.length}
+  {#if items.length}
     <select
       class="input__list"
       tabindex="-1"
       size={listSize}
 
       class:visible
-      class:scrolling={listSize < list.length}
+      class:scrolling={listSize < items.length}
 
       bind:value={selectValue}
 
@@ -117,12 +117,12 @@ class="input{$$restProps.class ? ' ' + $$restProps.class : ''}"
       on:click={selectClick}
       
     >
-      {#each list as opt, i}
+      {#each items as opt, num}
         <option
-          class:selected={selected === i}
-          class:focused={focused === i}
-          value={opt}>{opt}</option
-        >
+          class:selected={selected === num}
+          class:focused={focused === num}
+          value={opt}
+          >{opt}</option>
       {/each}
     </select>
   {/if}
@@ -148,7 +148,7 @@ class="input{$$restProps.class ? ' ' + $$restProps.class : ''}"
     margin: auto auto auto -1.25em;
     width: 0;
     height: 0;
-    border: 4px solid transparent;
+    border: 3px solid transparent;
     border-top-color: #000;
     border-bottom-width: 0;
   }
@@ -211,6 +211,7 @@ class="input{$$restProps.class ? ' ' + $$restProps.class : ''}"
     padding: 0.5em 1em;
   }
 
+  option:hover::after,
   option.focused::after {
     content: attr(value);
     padding: inherit;

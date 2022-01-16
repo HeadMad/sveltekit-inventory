@@ -1,33 +1,38 @@
 <script>
+// @ts-nocheck
+
   // import { query, path, fragment } from "svelte-pathfinder";
   import Modal from "$lib/components/default/modal/Modal.svelte";
   import Input from "$lib/components/default/input/Input.svelte";
 
-  import { title } from "$lib/store.js";
+  import { title, pin } from "$lib/store.js";
   $title = "Главная страница";
+
+  $: top = $pin ? '40px' : '0';
 
   let rows = [];
   let value = '';
   let ref;
   let searchResults = [];
-
+  
   async function onInputSearch(event) {
-    if (this.value.length < 3) return searchResults = [];
-
-    const res = await fetch('/search/api?s=' + this.value);
+    if (value.length < 3) return searchResults = [];
+    
+    const res = await fetch('/search/api?s=' + value);
     const result = await res.json();
     console.log(result)
     if (result.ok)
-      searchResults = result.result;
-    }
-    
-    function onListSelect(event) {
-      const val = event.detail;
-      rows = rows.concat(val);
-      // searchResults = [];
-      // value = '';
+    searchResults = result.result;
   }
- 
+  
+  function onListSelect(event) {
+    const val = event.detail;
+    rows = rows.concat(val);
+    // searchResults = [];
+    // value = '';
+  }
+  
+  
 </script>
 
 <div class="wrap">
@@ -35,11 +40,9 @@
     <h1>Инвентаризация товаров</h1>
     <p>В поле ниже поместите штрихкод или начниет вводить название товара</p>
   </section>
-  <div class="controll">
+  <div class="controll" style="top:{top}">
     <Input
-    spread={15}
-
-      bind:value
+    bind:value
 
       list={searchResults}
 
@@ -57,13 +60,11 @@
   <button on:blur={()=> ref.focus()}>+1</button>
 </div>
 <div class="rows">
-  <Input list={["some", "name", 123789]}>
-    <small slot="after"><small>Error text</small></small>
-  </Input>
   
+  <Input list={["some", "like", "you", "like"]} type="button" value="like"></Input>
   
     <table>
-      {#each rows as row, i}
+      {#each Array(50).fill('hello') as row, i}
         <tr>
           <td>{row}</td>
         </tr>
@@ -96,6 +97,7 @@
     background: #fff;
     box-shadow: 0 0 20px #00000035;
     box-sizing: border-box;
+    transition: .1s;
   }
   /* .controll:hover {
 		resize: horizontal;

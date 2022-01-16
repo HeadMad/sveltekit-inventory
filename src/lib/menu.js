@@ -15,4 +15,9 @@ export default [
     text: "Настройки",
     href: "/settings",
   },
+  {
+    text: "Load XLSX",
+    href: "/catalog/test",
+  },
+
 ];

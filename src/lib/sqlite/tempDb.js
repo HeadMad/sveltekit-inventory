@@ -84,7 +84,7 @@ function Delete(table, id) {
 }
 
 export async function search(query) {
-  const sql = `SELECT text FROM search WHERE text MATCH '${query}'`;
+  const sql = `SELECT DISTINCT text FROM search WHERE text MATCH '${query}'`;
   return Result(async () => {
     const rows = await db.prepare(sql).all();
     return rows.map(r => r.text);

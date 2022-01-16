@@ -16,6 +16,6 @@
   "dependencies": {
     "better-sqlite3": "^7.4.6",
     "svelte-headroom": "^2.2.1",
-    "svelte-sheets": "^0.2.2"
+    "xlsx": "^0.17.5"
   }
 }

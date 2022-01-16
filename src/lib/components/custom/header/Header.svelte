@@ -1,12 +1,13 @@
 <script>
   import Headroom from "$lib/components/default/headroom/Headroom.svelte";
   import menu from "$lib/menu";
+  import { pin } from "$lib/store";
 
   let page = "";
   export { page };
 </script>
 
-<Headroom>
+<Headroom on:pin={() => $pin = true} on:unpin={() => $pin = false}>
   <header>
     <div class="wrap">
       <ul class="menu">

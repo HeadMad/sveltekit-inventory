@@ -22,7 +22,8 @@
     const { files } = event.detail;
     for (let file of files) {
       // If dataBase has this table
-      if (tablesList.includes(file.name)) return null;
+      if (tablesList.includes(file.name))
+        continue;
 
       const reader = new FileReader();
       reader.readAsText(file);
@@ -103,10 +104,10 @@
     display: flex;
     gap: 2em;
   }
-  section {
+  /* section {
     overflow: hidden;
-    /* flex-grow: 1; */
-  }
+    flex-grow: 1;
+  } */
   .uploader > :global(div) {
     align-self: stretch;
     min-height: 150px;
@@ -118,8 +119,8 @@
     border-radius: 10px;
   }
 
-  .table {
+  /* .table {
     position: sticky;
     top: 0;
-  }
+  } */
 </style>

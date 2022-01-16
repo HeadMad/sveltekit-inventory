@@ -1,4 +1,4 @@
-import db from '$lib/sqlite/db';
+import db from '$lib/sqlite/tempDb';
 
 const sql = `CREATETABLE table2 (
   id INT PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -8,9 +8,5 @@ const sql = `CREATETABLE table2 (
   address TEXT NOT NULL
   ); `
   
-db.run(sql, [], (err) => {})
 
-
-
-db.close();
 

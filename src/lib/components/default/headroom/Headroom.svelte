@@ -55,7 +55,7 @@
     width: 100%;
     top: 0;
     transition: transform .1s ease-in-out;
-    z-index: 100;
+    z-index: 1000;
   }
   .pin {
     transform: translateY(0%);
