@@ -1,5 +1,5 @@
-
 <script>
+  import {createTable, parseTable} from "./createTable";
 import Uploader from "$lib/components/default/uploader/Uploader.svelte";
 import Selectable from "$lib/components/default/selectable/selectable.table";
 import XLSX from "xlsx";
@@ -20,10 +20,12 @@ import XLSX from "xlsx";
     const raw = Sheets[SheetNames[0]];
 
     const htmlString = await XLSX.utils.sheet_to_html(raw);
-    const table = await parseHtmlTable(htmlString);
+    // const table = await parseHtmlTable(htmlString);
+    // tableWrap.insertAdjacentHTML('afterbegin', htmlString);
+    const table = createTable(htmlString);
     tableWrap.append(table);
 
-    initSelectable(table);
+    // initSelectable(table);
     showTable = true;
     
   }
@@ -76,10 +78,33 @@ import XLSX from "xlsx";
   async function normalizeTable() {
 
     const table = tableWrap.querySelector('table');
+    await normaliseCells(table);
+    await normaliseEmptySapce(table);
+    
+    selectable.destroy();
+    selectable.init({
+      filter: '.table td:not(.service)',
+      appendTo: '.table'
+    });
+    selectable.table(table);
+  }
+
+  function normaliseEmptySapce(table) {
     const rows = table.tBodies[0].rows;
-  
-    await foreach(rows, async (row, r) =>
-      await foreach(row.cells, (cell, c) => {
+    foreach(rows, (row, r) => {
+      const empty = foreach(row.cells, (cell, c) => {
+        if (c === 0) return true;
+        return cell.innerHTML.length === 0;
+      });
+      console.log(empty, row.sectionRowIndex);
+      if (empty) table.tBodies[0].deleteRow(row.sectionRowIndex);
+    });
+  }
+
+  function normaliseCells(table) {
+    const rows = table.tBodies[0].rows;
+    foreach(rows, (row, r) =>
+      foreach(row.cells, (cell, c) => {
         if (c === 0) return;
         let rowspan = cell.rowSpan;
         let colspan = cell.colSpan;
@@ -90,45 +115,39 @@ import XLSX from "xlsx";
             const nr = r + rowspan;
             const nc = rowspan ? c - 1 : c;
             const span = rowspan ? colspan : colspan - 1; 
-            try {
-              rows[nr].cells[nc]
-              .insertAdjacentHTML('afterEnd', Array(span).fill('<td></td>').join(''));
-
-              console.log(nr, nc, span)
-
-            } catch (err) {
-              console.log(err.toString())
-              console.log(nr, nc, rows[nr])
-            }
+            rows[nr].cells[nc]
+            .insertAdjacentHTML('afterEnd', Array(span).fill('<td></td>').join(''));
           }
-          
-
-        // if (colspan > 1)
-        //   cell.insertAdjacentHTML('afterEnd', Array(colspan - 1).fill('<td></td>').join(''));
         
           cell.rowSpan = 1;
           cell.colSpan = 1;
       })
     );
-
-    initSelectable(table);
   }
 
 
   async function initSelectable(table) {
     selectable = new Selectable({
-      filter: '.table td:not(.service)'
+      filter: '.table td:not(.service)',
+      appendTo: '.table'
     });
-    // selectable.on("init", function() {});    
+    selectable.on("end", function(e, selected) {
+      console.log(selected)
+    });
+    
+    
     selectable.table(table);
+
+
     
   }
 
 
   function foreach(iter, handler) {
-    for (let i = 0; i < iter.length; i++) {
-      handler(iter[i], i);
-    }
+    for (let i = 0; i < iter.length; i++)
+      if (handler(iter[i], i) === false)
+        return false;
+    return true;
   }
 
 
@@ -138,7 +157,7 @@ import XLSX from "xlsx";
 <div class="wrap">
   {#if showTable}
     <div class="controll">
-      <button>Удалить</button>
+      <button on:click={() => selectable.invert()}>Инвертировать</button>
       <button>Новая таблица</button>
       <button on:click={normalizeTable}>Нормализовать таблицу</button>
     </div>

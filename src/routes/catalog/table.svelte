@@ -1,17 +1,12 @@
 <script context="module">
+  import {createRequest} from "$lib/api";
   export async function load({ page, fetch }) {
-    const name = page.params.name;
-
-    const res = await fetch(
-      `/catalog/api/table?data=${encodeURIComponent(
-        JSON.stringify({ table: name })
-      )}`
-    );
-    const result = await res.json();
-    if (!result.ok) return console.log(result);
+    const name = page.query.get('name');
+    const response = await createRequest('/catalog/api', fetch)('getTableData', {table: name})
+    if (!response.ok) return console.log(response);
 
     return {
-      props: { name, tableData: result.result },
+      props: { name, tableData: response.result },
     };
   }
 </script>

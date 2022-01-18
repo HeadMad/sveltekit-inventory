@@ -7,7 +7,7 @@ process.on('exit', () => db.close());
 // Create Search table
 (function () {
   const sql = `CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts4(text, tablename, id INTEGER);`;
-  console.log(Result(async () => await db.prepare(sql).run()))
+  console.log("Create Search:", db.prepare(sql).run())
 })()
 
 
@@ -16,38 +16,34 @@ process.on('exit', () => db.close());
  * @param {string} table - Table name
  * @param {number} length - number of columns
  */
-function Create(table, length) {
+function createTable({ table, length }) {
   const placeholders = genColsNames(length);
   const sql = `CREATE TABLE '${table}' (${placeholders});`;
-  return Result(() => db.prepare(sql).run());
-}
+  return db.prepare(sql).run();
+};
 
 /**
  * 
  * @param {string} table - Table name
  * @param {array} rows - Array of rows
  */
-async function Insert(table, rows) {
+async function fillTable({ table, rows }) {
   const cols = genColsNames(rows[0].length);
   const placeholders = new Array(rows[0].length).fill('?').join(',');
   const insertSql = `INSERT INTO '${table}' (${cols}) VALUES (${placeholders});`;
   const searchSql = `INSERT INTO search (text, tablename, id) VALUES (?, '${table}', ?);`;
-
-  return Result(async () => {
-    const insert = db.prepare(insertSql);
-    const search = db.prepare(searchSql);
-
-    const transact = db.transaction((rows) => {
-      rows.forEach(async (row, i) => {
-        insert.run(row);
-        search.run(row.join(' '), i+1);
-      });
+  const insert = db.prepare(insertSql);
+  const search = db.prepare(searchSql);
+  const transact = db.transaction((rows) => {
+    rows.forEach(async (row, i) => {
+      insert.run(row);
+      search.run(row.join(' '), i + 1);
     });
-    
-    transact(rows);
-    return await db.prepare('SELECT last_insert_rowid();').get();
   });
-}
+
+  transact(rows);
+  return await db.prepare('SELECT last_insert_rowid();').get();
+};
 
 /**
  * 
@@ -56,21 +52,17 @@ async function Insert(table, rows) {
  * @param {number} offset - Ofset of rows
  * @returns {array} - Array of rows
  */
-async function Select(table, limit = null, offset = null, where = null) {
+async function getTableData({ table, limit = null, offset = null, where = null }) {
   let sql = `SELECT * FROM "${table}"`;
   if (limit) sql += ' LIMIT ' + limit;
   if (offset) sql += ' OFFSET ' + offset;
   if (where) sql += ' WHERE ' + where;
-
-  return Result(() => {
-    const result = [];
-    const stmt = db.prepare(sql);
-    for (let row of stmt.iterate())
-      result.push(Object.values(row));
-    return result;
-  });
-
-}
+  const result = [];
+  const stmt = db.prepare(sql);
+  for (let row of stmt.iterate())
+    result.push(Object.values(row));
+  return result;
+};
 
 /**
  * 
@@ -78,55 +70,44 @@ async function Select(table, limit = null, offset = null, where = null) {
  * @param {number} id - Row id for deleting
  * @returns 
  */
-function Delete(table, id) {
+async function deleteTable({ table, id }) {
   const sql = `DELETE FROM "${table}" WHERE rowid = ${id}`;
-  return Result(() => db.prepare(sql).run());
-}
+  return db.prepare(sql).run();
+};
 
-export async function search(query) {
+
+/**
+ * @param {string} query - Search query
+ * @returns {array} - List of results on query
+ */
+async function search({ query }) {
   const sql = `SELECT DISTINCT text FROM search WHERE text MATCH '${query}'`;
-  return Result(async () => {
-    const rows = await db.prepare(sql).all();
-    return rows.map(r => r.text);
-  });
-}
+  const rows = await db.prepare(sql).all();
+  return rows.map(r => r.text);
+};
 
-export async function getTablesList() {
-  return Result(async () => {
-    const result = await db.prepare(`SELECT name FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'search%'`).all();
-    return result.map(r => r.name);
-  });
-}
-
+/**
+ * @return {array} - List of tables in database
+ */
+async function getTablesList() {
+  const result = await db.prepare(`SELECT name FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'search%'`).all();
+  return result.map(r => r.name);
+};
 
 
 
-
-
-export default function (table) {
-  return {
-    create: (length) => Create(table, length),
-    set: (rows) => Insert(table, rows),
-    get: (limit = null, offset = null) => Select(table, limit, offset)
-  };
-}
+export default {
+  createTable,
+  fillTable,
+  getTableData,
+  deleteTable,
+  search,
+  getTablesList
+};
 
 
 /*----------------------- HELPERS ---------------------*/
 
 function genColsNames(length) {
   return new Array(length).fill().map((_, i) => 'col' + (i + 1)).join(',')
-}
-
-async function Result(handler) {
-  try {
-    return { ok: true, result: await handler() }
-  } catch (err) {
-    return { ok: false, message: err.toString() }
-  }
-}
-
-async function createSearchTrigger(table) {
-    const sql = `CREATE TRIGGER AFTER INSERT ON '${table}`
-
 }

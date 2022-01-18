@@ -1,8 +1,8 @@
 <script context="module">
+  import {createRequest} from "$lib/api";
   export async function load({ fetch }) {
-    const res = await fetch("/catalog/api/tables");
-    const result = await res.json();
-    const tablesList = result.ok ? result.result : [];
+    const response = await createRequest('/catalog/api', fetch)('getTablesList');
+    const tablesList = response.ok ? response.result : [];
     return {
       props: { tablesList },
     };
@@ -12,6 +12,9 @@
 <script>
   import Uploader from "$lib/components/default/uploader/Uploader.svelte";
   import { title } from "$lib/store.js";
+
+  const fetchData = createRequest('/catalog/api');
+
   $title = "Каталог таблиц";
   export let tablesList;
 
@@ -31,15 +34,15 @@
       reader.onload = async () => {
         const rows = await getRowsfromHtml(reader.result);
 
-        const create = await fetchData("POST", {
+        const createTable = await fetchData('createTable', {
           table: file.name,
           length: rows[0].length,
         });
-        console.log("Create: ", create);
+        console.log({createTable});
 
-        const insert = await fetchData("PUT", { table: file.name, rows });
-        console.log("Insert: ", insert);
-        if (insert.ok) tablesList = tablesList.concat(file.name);
+        const fillTable = await fetchData('fillTable', { table: file.name, rows });
+        console.log({fillTable});
+        if (fillTable.ok) tablesList = tablesList.concat(file.name);
       };
     }
   }
@@ -61,21 +64,7 @@
     return result;
   }
 
-  async function fetchData(method, data) {
-    let url = "/catalog/api/table";
-    let result;
-    if (method == "GET") {
-      url += "?data=" + JSON.stringify(data);
-      result = await fetch(url);
-    } else {
-      result = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json;charset=utf-8" },
-        body: JSON.stringify(data),
-      });
-    }
-    return await result.json();
-  }
+ 
 </script>
 
 <div class="wrap">
@@ -85,7 +74,7 @@
 
   <ul>
     {#each tablesList as name}
-      <li><a href="/catalog/{name}">{name}</a></li>
+      <li><a href="/catalog/table?name={encodeURI(name)}">{name}</a></li>
     {/each}
   </ul>
   <div class="uploader">

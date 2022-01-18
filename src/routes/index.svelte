@@ -4,9 +4,13 @@
   // import { query, path, fragment } from "svelte-pathfinder";
   import Modal from "$lib/components/default/modal/Modal.svelte";
   import Input from "$lib/components/default/input/Input.svelte";
+  import {createRequest} from "$lib/api";
 
   import { title, pin } from "$lib/store.js";
+
   $title = "Главная страница";
+
+  const fetchData = createRequest('/search/api');
 
   $: top = $pin ? '40px' : '0';
 
@@ -18,8 +22,7 @@
   async function onInputSearch(event) {
     if (value.length < 3) return searchResults = [];
     
-    const res = await fetch('/search/api?s=' + value);
-    const result = await res.json();
+    const result = await fetchData('search', {query: value});
     console.log(result)
     if (result.ok)
     searchResults = result.result;
@@ -52,7 +55,12 @@
       class="input_grow_1"
       size="40"
     >
-  <small slot="before">Вставте штрихкод или введите часть названия</small>
+    
+  <small slot="before">
+    {#if searchResults.length}Найдено результатов: {searchResults.length}
+    {:else}Вставте штрихкод или введите часть названия{/if}
+  </small>
+
   </Input>
 
   
@@ -61,10 +69,8 @@
 </div>
 <div class="rows">
   
-  <Input list={["some", "like", "you", "like"]} type="button" value="like"></Input>
-  
     <table>
-      {#each Array(50).fill('hello') as row, i}
+      {#each rows as row, i}
         <tr>
           <td>{row}</td>
         </tr>
@@ -75,6 +81,9 @@
 
 
 <style>
+
+
+
   .wrap {
     display: flex;
     flex-direction: column;
