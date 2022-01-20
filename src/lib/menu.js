@@ -19,5 +19,9 @@ export default [
     text: "Load XLSX",
     href: "/catalog/test",
   },
+  {
+    text: "ReadXLSX",
+    href: "/catalog/read-exel",
+  },
 
 ];

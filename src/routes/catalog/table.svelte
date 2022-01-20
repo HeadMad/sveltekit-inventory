@@ -1,5 +1,5 @@
 <script context="module">
-  import {createRequest} from "$lib/api";
+  import {createRequest} from "$lib/API";
   export async function load({ page, fetch }) {
     const name = page.query.get('name');
     const response = await createRequest('/catalog/api', fetch)('getTableData', {table: name})

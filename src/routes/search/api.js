@@ -1,5 +1,5 @@
 import db from "$lib/sqlite/tempDb";
-import {createHandlerResponse} from "$lib/api"
+import {createHandlerResponse} from "$lib/API"
 
 export async function post({body}) {
   const {method, params} = body;

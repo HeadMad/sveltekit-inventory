@@ -4,7 +4,7 @@
   // import { query, path, fragment } from "svelte-pathfinder";
   import Modal from "$lib/components/default/modal/Modal.svelte";
   import Input from "$lib/components/default/input/Input.svelte";
-  import {createRequest} from "$lib/api";
+  import {createRequest} from "$lib/API";
 
   import { title, pin } from "$lib/store.js";
 
@@ -23,7 +23,7 @@
     if (value.length < 3) return searchResults = [];
     
     const result = await fetchData('search', {query: value});
-    console.log(result)
+
     if (result.ok)
     searchResults = result.result;
   }
