@@ -1,5 +1,5 @@
 <script>
-  import TableParser, {parseHtmlString, fillElementTable} from "$lib/plugins/TableParser";
+  import TableParser from "$lib/plugins/TableParser";
   import Table from "$lib/components/custom/table/Table.svelte";
   import Uploader from "$lib/components/default/uploader/Uploader.svelte";
   import Selectable from "$lib/plugins/selectable/selectable.table";
@@ -14,6 +14,7 @@ import { clear_loops } from "svelte/internal";
 
   let showTable = false;
   let selectable;
+  let parser;
   let table;
 
   let rows = [];
@@ -29,37 +30,32 @@ import { clear_loops } from "svelte/internal";
     // console.log(await XLSX.utils.sheet_to_json(raw));
     const htmlString = await XLSX.utils.sheet_to_html(raw);
 
-    table = new TableParser(htmlString, (value) => {
+    parser = new TableParser(htmlString, (value) => {
       const el = document.createElement('td');
       el.innerText = value;
       return {el, value};
     });
 
-    table.filterRows(({value}) => {
-      // console.log(value === '');
-      return value !== '';
-    }).filterRows((_, r) => r < 10)
-    .filterColumns(({value}) => value !== '')
-    
+    parser.filterTable(({value}, r, c) => value !== '');
 
-    // console.log(table.array)
 
-    table.node.insertAdjacentHTML('afterbegin', '<thead><tr>'
+    table = createTable();
+
+    table.tHead.insertAdjacentHTML('afterbegin', '<tr>'
       + '<th class="service" data-selectable="all">🡮</th>'
-      + table.array[0].map((_, i) => '<th class="service" data-selectable="column">' + i + '</th>').join('')
+      + parser.array[0].map((_, i) => '<th class="service" data-selectable="column">' + i + '</th>').join('')
       + '</tr></thead><tbody></tbody>');
     
-    table.fillNode((node, row, r) => {
+    parser.eachRow((row, r) => {
       const rowElem = document.createElement('tr');
       rowElem.insertAdjacentHTML('afterbegin', '<td class="service" data-selectable="row">' + r + '</td>');
       row.forEach(td => rowElem.append(td.el));
-      node.tBodies[0].append(rowElem);
+      table.tBodies[0].append(rowElem);
     });
 
+    document.querySelector('.table').append(table);
 
-    document.querySelector('.table').append(table.node);
-
-    initSelectable(table.node);
+    initSelectable(table);
     showTable = true;
   }
   
@@ -78,9 +74,13 @@ import { clear_loops } from "svelte/internal";
     selectable.table(table);
   }
 
-  function normalizeTable() {
-
+  function createTable() {
+    const table = document.createElement('table');
+    table.insertAdjacentHTML('afterbegin', '<thead></thead><tbody></tbody>');
+    return table;
   }
+
+  function normalizeTable() {}
 
   // function onTableChange({detail}) {
   //   console.log('change table');

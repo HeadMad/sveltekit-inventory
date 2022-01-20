@@ -1,12 +1,6 @@
 
 export default function TableParser(table, handler = (cell) => cell) {
   this.array = parseTable(table, handler);
-  this.node = document.createElement('table');
-
-  this.fillNode = (handler) => {
-    fillElementTable(this.array, handler, this.node);
-    return this;
-  };
 
   this.filterRows = (handler) => {
     this.array = filterRows(this.array, handler);
@@ -18,12 +12,20 @@ export default function TableParser(table, handler = (cell) => cell) {
     return this;
   };
 
-  this.filterAll = (handler) => {
+  this.filterTable = (handler) => {
     this.array = filterTable(this.array, handler);
     return this;
   };
 
-  return this;
+  this.eachRow = (handler) => {
+    eachRow(this.array, handler);
+    return this;
+  };
+
+  this.eachCell = (handler) => {
+    eachCell(this.array, handler);
+    return this;
+  };
 }
 
 export function parseTable(table, handler) {
@@ -87,10 +89,16 @@ export function parseDOMElement(node, handler) {
 }
 
 
-export function fillElementTable(parsedTable, handler, table = document.createElement('table')) {
+export function eachRow(parsedTable, handler) {
   for (let r = 0; r < parsedTable.length; r++)
-    handler(table, parsedTable[r], r);
-  return table;
+    handler(parsedTable[r], r);
+}
+
+export function eachCell(parsedTable, handler) {
+  eachRow(parsedTable, (row, r) => {
+    for (let c = 0; c < row.length; c++)
+      handler(row[c], c, r);
+  });
 }
 
 export function filterTable(parsedTable, handler) {
