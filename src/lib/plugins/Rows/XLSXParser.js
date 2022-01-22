@@ -8,9 +8,6 @@ export default function XLSXParser(data, handler) {
 function parseData(data, handler) {
   const { Sheets, SheetNames } = XLSX.read(data);
   const sheet = Sheets[SheetNames[0]];
-
-  console.log(XLSX.utils.sheet_to_json(sheet, {header:1, blankrows: false }));
-
   const range = XLSX.utils.decode_range(sheet['!ref']);
 
   const sr = range.s.r;
