@@ -1,6 +1,7 @@
+import XLSX from "xlsx";
 
-export default function TableParser(table, handler = (cell) => cell) {
-  this.rows = parseTable(table, handler);
+export default function XLSXParser(data, handler) {
+  this.rows = parseData(data, handler);
 
   this.filterRows = (handler) => {
     this.rows = filterRows(this.rows, handler);
@@ -28,66 +29,28 @@ export default function TableParser(table, handler = (cell) => cell) {
   };
 }
 
-export function parseTable(table, handler) {
-  switch (table.constructor.name) {
-    case 'String':
-      return parseHtmlString(table, handler);
-      break;
+function parseData(data, handler) {
+  const { Sheets, SheetNames } = XLSX.read(data);
+  const sheet = Sheets[SheetNames[0]];
+  const range = XLSX.utils.decode_range(sheet['!ref']);
 
-    case 'Array':
-      return table;
-  
-    default:
-      return parseDOMElement(table, handler);
-      break;
+  const sr = range.s.r;
+  const sc = range.s.c;
+
+  const result = Array(range.e.r - range.s.r + 1).fill().map(row => []);
+
+  for (let r = sr; r <= range.e.r; ++r) {
+    for (let c = sc; c <= range.e.c; ++c) {
+      const addr = { r, c };
+      const ref = XLSX.utils.encode_cell(addr);
+      const value = !(ref in sheet) ? '' : sheet[ref].v !== undefined ? sheet[ref].v : '';
+      const nr = r - sr;
+      const nc = c - sc;
+      result[nr][nc] = handler(value, nr, nc, ref);
+    }
   }
-}
-
-
-export function parseHtmlString(html, handler) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  return parseDOMElement(doc, handler);
-}
-
-export function parseDOMElement(node, handler) {
-  const table = node.querySelector('table');
-
-  const rows = table.rows;
-  const rlen = rows.length;
-
-  const result = Array(rlen).fill().map(row => []);
-  for (let r = 0; r < rlen; r++) {
-    const cells = rows[r].cells;
-    for (let c = 0; c < cells.length; c++) {
-      const cell = rows[r].cells[c];
-      const cspan = cell.colSpan;
-      const rspan = cell.rowSpan;
-      if (handler) {
-        for (let i = r; i < r + rspan; i++) {
-          let n = cspan;
-          const cells = [];
-          const len = result[i].length;
-          while (n--) {
-            const c = len + n;
-            if (n === 0 && i === r) cells[0] = handler(cell.innerText, i, c);
-            else cells[n] = handler('', i, c);
-          }
-          result[i].push(...cells);
-        }
-
-      } else {
-        for (let i = r; i < r + rspan; i++) {
-          const cells = Array(cspan).fill('');
-          if (i === r) cells[0] = cell.innerText;
-          result[i].push(...cells);
-        }
-      }
-    } // cells
-  } // rows
   return result;
 }
-
 
 export function eachRow(parsedTable, handler) {
   for (let r = 0; r < parsedTable.length; r++)
@@ -143,3 +106,4 @@ function filterColumns(parsedTable, handler) {
   }
   return result;
 }
+
