@@ -2,51 +2,72 @@
   import outsideClick from "$lib/actions/outsideClickAction";
 
   let rows = [];
-  let start;
   let range = new Set();
+  let start;
+  let state;
 
-  function onTableClick(event) {
-    const td = event.target.closest("td");
+  /**
+   * 
+   * @param i 0 - row, 1 -col
+   * @param num Argument from dataset
+   * @param max Max row or column
+   * @param key 'shift' or 'ctrl'
+   */
+  function rowColAction(i, num, max, key) {
+    const from = [0, 0];
+    const to = [max, max]
+    if (key === 'shift') {
+      from[i] = Math.min(start[i], num);
+      to[i] = Math.max(start[i], num);
 
-    if (td.classList.contains("service")) {
-      if (!event.shiftKey) deselectRange();
-      const r = rows.length - 1;
-      const c = rows[0].length - 1;
-      // select all
-      if ("all" in td.dataset) {
-        selectRange([0, 0], [r, c]);
-
-        // select cell
-      } else if ("col" in td.dataset) {
-        const col = Number(td.dataset.col);
-        selectRange([0, col], [r, col]);
-
-        // select row
-      } else if ("row" in td.dataset) {
-        const row = Number(td.dataset.row);
-        selectRange([row, 0], [row, c]);
-      }
     } else {
-      const r = Number(td.dataset.row);
-      const c = Number(td.dataset.col);
-      const cell = [r, c];
+      from[i] = num;
+      to[i] = num;  
+    }
+    return {from, to};
+  }
 
-      if (start && event.shiftKey) {
-        selectRange(start, cell);
-      } else {
-        deselectRange();
-        selectRange(cell);
-      }
+  const selection = {
+    all({r, c}) {
+      if (state === 'all') deselectRange();
+      else selectRange([0, 0], [r, c]);
+    },
+    col({col, r}, key) {
+      const {from, to} = rowColAction(1, col, r, key);
+      selectRange(from, to);
+    },
+    row({row, c}, key) {
+      const {from, to} = rowColAction(0, row, c, key);
+      selectRange(from, to);
+    },
+    cell({col, row}) {
+      const cell = [row, col];
+      if (start) selectRange(start, cell);
+      else selectRange(cell);
     }
   }
 
+  function onTableClick(event) {
+    const td = event.target.closest("td");
+    const key = event.shiftKey ? 'shift'
+    : event.ctrlKey ? 'ctrl' : false;
+    if (!key) deselectRange();
+
+    const {action, ...args} = td.dataset;
+    args.r = rows.length - 1;
+    args.c = rows[0].length - 1;
+    selection[action](args, key);
+    state = action;
+
+  }
+
   function selectRange(from, to) {
+    start = from;
     const [fr, fc] = from;
 
     // select one cell
     if (!to) {
       rows[fr][fc].selected = true;
-      start = from;
       range.add(from);
 
       // select range of cells
@@ -61,7 +82,9 @@
   }
 
   function deselectRange() {
+    state = null;
     start = null;
+
     if (!range.size) return;
     for (let [r, c] of range) {
       if (!rows[r] || !rows[r][c]) {
@@ -71,6 +94,7 @@
       rows[r][c].selected = false;
     }
     range.clear();
+
   }
 
   function deselectRows() {
@@ -90,17 +114,21 @@
     <col />
     <thead>
       <tr>
-        <td class="service" data-all>🡮</td>
+        <td class="service" data-action="all">🡮</td>
         {#each rows[0] as _, c}
-          <td class="service" data-col={c}>{c + 1}</td>
+          <td class="service" data-col={c} data-action="col">{c + 1}</td>
         {/each}
       </tr>
     </thead>
     {#each rows as row, r}
       <tr>
-        <td class="service" data-row={r}>{r + 1}</td>
+        <td class="service" data-row={r} data-action="row">{r + 1}</td>
         {#each row as cell, c}
-          <td data-row={r} data-col={c} class:selected={cell.selected}
+          <td
+          data-row={r}
+          data-col={c}
+          data-action="cell"
+          class:selected={cell.selected}
             >{cell.value}</td
           >
         {/each}

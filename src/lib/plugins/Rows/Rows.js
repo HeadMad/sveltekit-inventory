@@ -1,7 +1,5 @@
-import XLSX from "xlsx";
-
-export default function XLSXParser(data, handler) {
-  this.rows = parseData(data, handler);
+export default function Rows(rows) {
+  this.rows = rows;
 
   this.filterRows = (handler) => {
     this.rows = filterRows(this.rows, handler);
@@ -29,29 +27,6 @@ export default function XLSXParser(data, handler) {
   };
 }
 
-function parseData(data, handler) {
-  const { Sheets, SheetNames } = XLSX.read(data);
-  const sheet = Sheets[SheetNames[0]];
-  const range = XLSX.utils.decode_range(sheet['!ref']);
-
-  const sr = range.s.r;
-  const sc = range.s.c;
-
-  const result = Array(range.e.r - range.s.r + 1).fill().map(row => []);
-
-  for (let r = sr; r <= range.e.r; ++r) {
-    for (let c = sc; c <= range.e.c; ++c) {
-      const addr = { r, c };
-      const ref = XLSX.utils.encode_cell(addr);
-      const value = !(ref in sheet) ? '' : sheet[ref].v !== undefined ? sheet[ref].v : '';
-      const nr = r - sr;
-      const nc = c - sc;
-      result[nr][nc] = handler(value, nr, nc, ref);
-    }
-  }
-  return result;
-}
-
 export function eachRow(parsedTable, handler) {
   for (let r = 0; r < parsedTable.length; r++)
     handler(parsedTable[r], r);
@@ -71,7 +46,7 @@ export function filterTable(parsedTable, handler) {
 
 
 
-function filterRows(parsedTable, handler) {
+export function filterRows(parsedTable, handler) {
   if (!parsedTable.length) return [];
   const result = [];
   
@@ -84,7 +59,7 @@ function filterRows(parsedTable, handler) {
   return result;
 }
 
-function filterColumns(parsedTable, handler) {
+export function filterColumns(parsedTable, handler) {
   if (!parsedTable.length) return [];
   const rlen = parsedTable.length;
   const clen = parsedTable[0].length;
@@ -106,4 +81,3 @@ function filterColumns(parsedTable, handler) {
   }
   return result;
 }
-
