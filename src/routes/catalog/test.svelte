@@ -37,18 +37,44 @@
       <button
         on:click={() => {
           parser.filterTable(({ selected }) => selected);
+          parser.filterTable(({ value }) => value !== "");
           rows = parser.rows;
         }}>Обрезать</button
       >
+
       <button
         on:click={() => {
           parser.filterTable(({ selected }) => !selected);
           rows = parser.rows;
         }}>Удалить</button
       >
+
+      <button
+        on:click={() => {
+          parser.insertColumns(2, () => ({ selected: false, value: "string" }));
+          rows = parser.rows;
+        }}>Вставить колонку</button
+      >
+
+      <button
+        on:click={() => {
+          parser.insertRows(33, (r, c) => {
+            let value
+            if (parser.rows.every(row => typeof row[c].value === 'number'))
+              value = 'Сумма: ' + parser.rows.reduce((sum, row) => sum + row[c].value, 0);
+            else
+              value = '';
+            return {selected: false, value}
+          });
+          rows = parser.rows;
+        }}>Вставить строку</button
+      >
     </div>
 
-    <SelectableTable {rows} />
+    <SelectableTable {rows}>
+      <span slot="top" let:title let:id>{id}: {title}</span>
+      <span slot="right" let:id>{id}:</span>
+    </SelectableTable>
   {/if}
 </div>
 

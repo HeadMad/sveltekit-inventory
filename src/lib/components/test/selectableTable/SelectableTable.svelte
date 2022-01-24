@@ -1,9 +1,10 @@
 <script>
   import outsideClick from "$lib/actions/outsideClickAction";
+  import colName from "$lib/plugins/Rows/colName";
 
   let rows = [];
   let range = new Set();
-  let start;
+  let start = [0, 0];
   let state;
 
   /**
@@ -40,9 +41,9 @@
       const {from, to} = rowColAction(0, row, c, key);
       selectRange(from, to);
     },
-    cell({col, row}) {
+    cell({col, row}, key) {
       const cell = [row, col];
-      if (start) selectRange(start, cell);
+      if (key === 'shift') selectRange(start, cell);
       else selectRange(cell);
     }
   }
@@ -83,7 +84,7 @@
 
   function deselectRange() {
     state = null;
-    start = null;
+    start = [0, 0];
 
     if (!range.size) return;
     for (let [r, c] of range) {
@@ -112,17 +113,24 @@
 {#if rows.length}
   <table use:outsideClick={deselectRange} on:click={onTableClick}>
     <col />
+    <slot name="before" />
     <thead>
       <tr>
         <td class="service" data-action="all">🡮</td>
         {#each rows[0] as _, c}
-          <td class="service" data-col={c} data-action="col">{c + 1}</td>
+        {@const title = colName(c)}
+          <td class="service" data-col={c} data-action="col">
+          <slot name="top" id={c+1} {title} >{title}</slot>
+          </td>
         {/each}
       </tr>
     </thead>
     {#each rows as row, r}
+    {@const id = r + 1}
       <tr>
-        <td class="service" data-row={r} data-action="row">{r + 1}</td>
+        <td class="service" data-row={r} data-action="row">
+        <slot name="right" {id}>{id}</slot>
+        </td>
         {#each row as cell, c}
           <td
           data-row={r}
