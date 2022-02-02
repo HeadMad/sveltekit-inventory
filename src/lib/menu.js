@@ -17,7 +17,7 @@ export default [
   },
   {
     text: "Load XLSX",
-    href: "/catalog/test",
+    href: "/catalog/upload",
   },
 
 ];

@@ -120,16 +120,15 @@
         {#each rows[0] as _, c}
         {@const title = colName(c)}
           <td class="service" data-col={c} data-action="col">
-          <slot name="top" id={c+1} {title} >{title}</slot>
+          <slot name="top" col={c} {title} >{title}</slot>
           </td>
         {/each}
       </tr>
     </thead>
     {#each rows as row, r}
-    {@const id = r + 1}
       <tr>
         <td class="service" data-row={r} data-action="row">
-        <slot name="right" {id}>{id}</slot>
+        <slot name="right" row={r}>{r + 1}</slot>
         </td>
         {#each row as cell, c}
           <td

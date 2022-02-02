@@ -1,21 +1,13 @@
 import XLSX from "xlsx";
+import Rows from "./Rows";
 
 export default function XLSXParser(data, handler) {
-  const { Sheets, SheetNames } = XLSX.read(data);
-  this.names = SheetNames;
-  this.sheets = SheetNames.map(name => handleSheet(Sheets[name], handler));
-  this.each = (eachHandler) => {
-    for (let n = 0; n < this.names.length; n++) {
-      let name = this.names[n];
-      let sheet = this.sheets[n];
-      if (eachHandler(name, sheet) === false) break;
-    }
-  };
+  return new Rows(parseData(data, handler));
 }
 
-function handleSheet(sheet, handler) {
-  if (!('!ref' in sheet)) return [];
-  
+function parseData(data, handler) {
+  const { Sheets, SheetNames } = XLSX.read(data);
+  const sheet = Sheets[SheetNames[0]];
   const range = XLSX.utils.decode_range(sheet['!ref']);
 
   const sr = range.s.r;

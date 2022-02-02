@@ -4,6 +4,7 @@
   import { pin } from "$lib/store";
   import SelectableTable from "$lib/components/test/selectableTable/SelectableTable.svelte";
 
+
   $: top = $pin ? "39px" : "0";
 
   let parser;

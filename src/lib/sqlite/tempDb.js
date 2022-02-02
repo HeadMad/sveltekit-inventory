@@ -13,32 +13,36 @@ process.on('exit', () => db.close());
 
 /**
  * 
- * @param {string} table - Table name
+ * @param {string} name - Table name
  * @param {number} length - number of columns
  */
-function createTable({ table, length }) {
+function createTable({ name, length }) {
   const placeholders = genColsNames(length);
-  const sql = `CREATE TABLE '${table}' (${placeholders});`;
+  const sql = `CREATE TABLE IF NOT EXISTS '${name}' (${placeholders});`;
   return db.prepare(sql).run();
 };
 
 /**
  * 
- * @param {string} table - Table name
+ * @param {string} name - Table name
  * @param {array} rows - Array of rows
  */
-async function fillTable({ table, rows }) {
+async function fillTable({ name, rows, indexing = false }) {
   const cols = genColsNames(rows[0].length);
   const placeholders = new Array(rows[0].length).fill('?').join(',');
-  const insertSql = `INSERT INTO '${table}' (${cols}) VALUES (${placeholders});`;
-  const searchSql = `INSERT INTO search (text, tablename, id) VALUES (?, '${table}', ?);`;
+  const insertSql = `INSERT INTO '${name}' (${cols}) VALUES (${placeholders});`;
+  const searchSql = `INSERT INTO search (text, tablename, id) VALUES (?, '${name}', ?);`;
   const insert = db.prepare(insertSql);
   const search = db.prepare(searchSql);
   const transact = db.transaction((rows) => {
-    rows.forEach(async (row, i) => {
+    const handle = !indexing 
+    ? (row) => insert.run(row)
+    : (row, i) => {
       insert.run(row);
       search.run(row.join(' '), i + 1);
-    });
+    }
+    
+    rows.forEach(handle);
   });
 
   transact(rows);
@@ -47,13 +51,26 @@ async function fillTable({ table, rows }) {
 
 /**
  * 
- * @param {string} table - Table name
+ * @param {string} name 
+ * @param {array} rows 
+ * @param {boolean} indexing 
+ * @returns 
+ */
+async function placeTable({ name, rows, indexing = false}) {
+  dropTable(name);
+  createTable({name, length: rows[0].length});
+  return await fillTable({name, rows, indexing});
+}
+
+/**
+ * 
+ * @param {string} name - Table name
  * @param {number} limit - Limit of rows
  * @param {number} offset - Ofset of rows
  * @returns {array} - Array of rows
  */
-async function getTableData({ table, limit = null, offset = null, where = null }) {
-  let sql = `SELECT * FROM "${table}"`;
+async function getTableData({ name, limit = null, offset = null, where = null }) {
+  let sql = `SELECT * FROM "${name}"`;
   if (limit) sql += ' LIMIT ' + limit;
   if (offset) sql += ' OFFSET ' + offset;
   if (where) sql += ' WHERE ' + where;
@@ -66,12 +83,21 @@ async function getTableData({ table, limit = null, offset = null, where = null }
 
 /**
  * 
- * @param {string} table - Table name
+ * @param {string} name - Table name
  * @param {number} id - Row id for deleting
  * @returns 
  */
-async function deleteTable({ table, id }) {
-  const sql = `DELETE FROM "${table}" WHERE rowid = ${id}`;
+async function deleteTable({ name, id }) {
+  const sql = `DELETE FROM "${name}" WHERE rowid = ${id}`;
+  return db.prepare(sql).run();
+};
+/**
+ * 
+ * @param {string} name - Table name
+ * @returns 
+ */
+async function dropTable(name) {
+  const sql = `DROP TABLE IF EXISTS "${name}"`;
   return db.prepare(sql).run();
 };
 
@@ -97,6 +123,7 @@ async function getTablesList() {
 
 
 export default {
+  placeTable,
   createTable,
   fillTable,
   getTableData,
