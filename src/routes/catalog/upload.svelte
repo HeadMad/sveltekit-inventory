@@ -36,7 +36,7 @@
         const name = `${fileName}/${sheetName}`;
         if (tablesList.includes(name)) return true;
 
-        const place = await fetchData('placeTable', { name, rows });
+        const place = await fetchData('placeTable', { name, rows, indexing: true });
         
         if (!place.ok) {
           console.log({place});

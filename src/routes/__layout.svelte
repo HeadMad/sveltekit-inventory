@@ -1,8 +1,8 @@
 <script context="module">
-  export function load({ page }) {
+  export function load({ url }) {
     return {
       props: {
-        page: page.path,
+        page: url.pathname,
       },
     };
   }
