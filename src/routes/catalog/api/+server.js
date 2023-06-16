@@ -11,7 +11,7 @@
 
 
 import db from "$lib/sqlite/tempDb.js";
-import {createHandlerResponse} from "$lib/API";
+import {createHandlerResponse} from "$lib/api";
 
 export async function post({ request }) {
   const {method, params} = await request.json();

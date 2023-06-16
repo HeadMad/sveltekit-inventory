@@ -1,18 +1,11 @@
-<script context="module">
-  import {createRequest} from "$lib/API";
-  export async function load({ fetch }) {
-    const response = await createRequest('/catalog/api', fetch)('getTablesList');
-    const tablesList = response.ok ? response.result : [];
-    return {
-      props: { tablesList },
-    };
-  }
-</script>
+
 
 <script>
-
+    export let data;
  
 </script>
+
+{JSON.stringify(data)}
 
 <div class="wrap">
   <ul class="menu">

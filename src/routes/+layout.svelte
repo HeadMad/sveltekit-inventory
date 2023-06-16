@@ -1,19 +1,12 @@
-<script context="module">
-  export function load({ url }) {
-    return {
-      props: {
-        page: url.pathname,
-      },
-    };
-  }
-</script>
-
 <script>
   import "../app.css";
   import { title } from "$lib/store.js";
   // import { click, path } from "svelte-pathfinder";
   import Header from "$lib/components/custom/header/Header.svelte";
+  export let data;
+  /** @type {*}*/
   let page;
+  $: page = data.page; 
   export { page };
 </script>
 

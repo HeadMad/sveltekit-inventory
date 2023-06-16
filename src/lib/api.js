@@ -1,9 +1,17 @@
+/**
+ * 
+ * @callback createRequestCallback
+ * @param {string} method - Method of Request
+ * @param {Object|null} [params = null] - params of request
+ * @returns {Object} - Response like {ok: true, result:{...rsult}} Or {ok: false, error: {message: ...}}
+ */
 
 /**
  * Creating function for sending request to End point
+ * 
  * @param {string} url - Local url for sending request
  * @param {function} fetchHandler - For server side request set server fetch
- * @returns {object} - Response like {ok: true, result:{...rsult}} Or {ok: false, error: {message: ...}}
+ * @returns {createRequestCallback}
  */
 export function createRequest(url, fetchHandler = fetch) {
   return async (method, params = null) => {

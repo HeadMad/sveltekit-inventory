@@ -13,8 +13,9 @@ process.on('exit', () => db.close());
 
 /**
  * 
- * @param {string} name - Table name
- * @param {number} length - number of columns
+ * @param {Object} table - Table
+ * @param {string} table.name - Table name
+ * @param {number} table.length - number of columns
  */
 function createTable({ name, length }) {
   const placeholders = genColsNames(length);
@@ -24,8 +25,10 @@ function createTable({ name, length }) {
 
 /**
  * 
- * @param {string} name - Table name
- * @param {array} rows - Array of rows
+ * @param {Object} table - Table
+ * @param {string} table.name - Table name
+ * @param {Object[]} table.rows - Array of rows
+ * @param {boolean} [table.indexing = false] - Array of rows
  */
 async function fillTable({ name, rows, indexing = false }) {
   const cols = genColsNames(rows[0].length);
@@ -51,9 +54,10 @@ async function fillTable({ name, rows, indexing = false }) {
 
 /**
  * 
- * @param {string} name 
- * @param {array} rows 
- * @param {boolean} indexing 
+ * @param {Object} table 
+ * @param {string} table.name 
+ * @param {Object[]} table.rows 
+ * @param {boolean} [table.indexing = false] 
  * @returns 
  */
 async function placeTable({ name, rows, indexing = false}) {
@@ -64,10 +68,12 @@ async function placeTable({ name, rows, indexing = false}) {
 
 /**
  * 
- * @param {string} name - Table name
- * @param {number} limit - Limit of rows
- * @param {number} offset - Ofset of rows
- * @returns {array} - Array of rows
+ * @param {Object} table
+ * @param {string} table.name - Table name
+ * @param {number|null} [table.limit = null] - Limit of rows
+ * @param {number|null} [table.offset = null] - Ofset of rows
+ * @param {string|null} [table.where = null] - Where query
+ * @returns {Promise<Object[]>} - Array of rows
  */
 async function getTableData({ name, limit = null, offset = null, where = null }) {
   let sql = `SELECT * FROM "${name}"`;
@@ -83,8 +89,9 @@ async function getTableData({ name, limit = null, offset = null, where = null })
 
 /**
  * 
- * @param {string} name - Table name
- * @param {number} id - Row id for deleting
+ * @param {Object} table 
+ * @param {string} table.name - Table name
+ * @param {number} table.id - Row id for deleting
  * @returns 
  */
 async function deleteTable({ name, id }) {
@@ -103,8 +110,10 @@ async function dropTable(name) {
 
 
 /**
- * @param {string} query - Search query
- * @returns {array} - List of results on query
+ * 
+ * @param {Object} table
+ * @param {string} table.query - Search query
+ * @returns {Promise<Object[]>} - List of results on query
  */
 async function search({ query }) {
   const sql = `SELECT DISTINCT text FROM search WHERE text MATCH '${query}'`;
@@ -113,7 +122,7 @@ async function search({ query }) {
 };
 
 /**
- * @return {array} - List of tables in database
+ * @return {Promise<Object[]>} - List of tables in database
  */
 async function getTablesList() {
   const result = await db.prepare(`SELECT name FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'search%'`).all();
