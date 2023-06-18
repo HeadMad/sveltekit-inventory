@@ -1,20 +1,10 @@
-<script context=module>
-   import {createRequest} from "$lib/api";
 
-   export async function load({ params, fetch, session, context }) {
-     const {name} = params;
-    const response = await createRequest('/catalog/api', fetch)('getTableData', {name});
-    const tableData = response.ok ? response.result : [];
-    return {
-      props: { tableData },
-    };
-  
-   }
-</script>
 <script>
   import Rows from "$lib/plugins/Rows/Rows";
   import SelectableTable from "$lib/components/test/selectableTable/SelectableTable.svelte";
-  let tableData = [];
+  export let data;
+  let {tableData} = data;
+  console.log(tableData)
   const parser = new Rows(tableData.map(row => row.map(value => ({selected: false, value}))));
   let rows = parser.rows;
   
@@ -34,7 +24,7 @@
     rows = parser.rows;
   }
 
-  export { tableData };
+  // export { tableData };
 
 </script>
 
