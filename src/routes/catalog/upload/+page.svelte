@@ -21,7 +21,7 @@
         const name = `${fileName}/${sheetName}`;
         if (tablesList.includes(name)) return true;
 
-        const place = await fetch("/catalog/api", {
+        const place = await fetch("/api", {
           method: "POST",
           headers: {
             'Content-Type': 'application/json'

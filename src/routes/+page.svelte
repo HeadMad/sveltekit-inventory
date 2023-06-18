@@ -10,7 +10,7 @@
 
   $title = "Главная страница";
 
-  const fetchData = createRequest('/search/api');
+  const fetchData = createRequest('/api');
 
   $: top = $pin ? '40px' : '0';
 

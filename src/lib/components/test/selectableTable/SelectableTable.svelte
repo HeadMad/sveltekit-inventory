@@ -2,7 +2,7 @@
   import outsideClick from "$lib/actions/outsideClickAction";
   import colName from "$lib/plugins/Rows/colName";
 
-  let rows = [];
+  export let rows = [];
   let range = new Set();
   let start = [0, 0];
   let state;
@@ -107,7 +107,7 @@
         rows[r][c].selected = false;
   }
 
-  export { rows };
+
 </script>
 
 {#if rows.length}

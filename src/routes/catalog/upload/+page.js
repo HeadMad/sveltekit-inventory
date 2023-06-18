@@ -1,5 +1,5 @@
 export async function load({ fetch }) {
-  const response = await fetch('/catalog/api', {
+  const response = await fetch('/api', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
