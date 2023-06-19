@@ -21,8 +21,8 @@
   
   async function onInputSearch(event) {
     if (value.length < 3) return searchResults = [];
-    
-    const result = await fetchData('search', {query: value});
+    const prepareValue = `'%${value.trim().split(/\s+/).join("%' AND text LIKE '%")}%'`;
+    const result = await fetchData('search', {query: prepareValue});
 
     if (result.ok)
     searchResults = result.result;

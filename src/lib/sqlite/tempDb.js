@@ -116,7 +116,8 @@ async function dropTable(name) {
  * @returns {Promise<Object[]>} - List of results on query
  */
 async function search({ query }) {
-  const sql = `SELECT DISTINCT text FROM search WHERE text MATCH '${query}'`;
+  const sql = `SELECT DISTINCT text FROM search WHERE text LIKE ${query}`;
+  console.log({sql});
   const rows = await db.prepare(sql).all();
   return rows.map(r => r.text);
 };
