@@ -26,18 +26,25 @@
     rows = parser.rows;
   }
 
+  function invertSelection() {
+    rows.map(row => row.map(cell => cell.selected = !cell.selected))
+    rows = rows;
+  }
+
   function onWindowKeyDown(event) {
-    if (event.code !== "Delete")
-    return;
+    if (event.code === "Delete") {
+      if (!event.ctrlKey && !event.shiftKey)
+      return removeCells();
 
-    if (!event.ctrlKey && !event.shiftKey)
-    return removeCells();
+      if (!event.ctrlKey && event.shiftKey)
+      return cutTable();
 
-    if (!event.ctrlKey && event.shiftKey)
-    return cutTable();
+      if (event.ctrlKey && !event.shiftKey)
+      return clearTable();
 
-    if (event.ctrlKey && !event.shiftKey)
-    return clearTable();
+    } else if (event.code === "KeyI" && event.ctrlKey) {
+      return invertSelection();
+    }
   }
 
 </script>
@@ -46,6 +53,7 @@
 
 <div class="wrap">
   <div>
+    <button on:click={invertSelection}>Инвертировать (Ctrl + I)</button>
     <button on:click={clearTable}>Почистить (Ctrl + Del)</button>
     <button on:click={cutTable}>Обрезать (Shift + Del)</button>
     <button on:click={removeCells}>Удалить (Del)</button>
