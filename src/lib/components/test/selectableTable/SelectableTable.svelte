@@ -61,7 +61,9 @@
   }
 
   function onTableDoubleClick(event) {
-    const td = event.target.closest("td");
+    const td = event.target.closest("td[data-action = cell]");
+    if (td === null)
+      return;
     const { col, row } = td.dataset;
     const cell = rows[Number(row)][Number(col)];
 
@@ -72,27 +74,31 @@
     td.addEventListener(
       "blur",
       function () {
+        cell.value = this.innerText;
         cell.editable = false;
         this.contentEditable = false;
+        this.removeEventListener('keydown', onInputContenteditable);
       },
       { once: true }
     );
     cursorInEndForContentEditable(td);
   }
-  
+
   function onInputContenteditable(event) {
     if (event.code !== "Enter")
     return;
     
     if (!event.ctrlKey)
     return this.blur();
-    
+
     if (this.innerText.at(-1) !== '\n')
       this.innerText += '\n';
     this.innerText += '\n';
-      
+    
     cursorInEndForContentEditable(this);
   }
+  
+  
 
   function selectRange(from, to) {
     start = from;
@@ -136,7 +142,14 @@
     for (let r = 0; r < rlen; r++)
       for (let c = 0; c < clen; c++) rows[r][c].selected = false;
   }
+
+
+  function onWindowKeydown(event) {
+    if (event.code === 'Escape')
+      deselectRange();
+  }
 </script>
+<svelte:window on:keydown={onWindowKeydown}/>
 
 {#if rows.length}
   <table
@@ -197,10 +210,10 @@
     border: 1px solid #ddd;
     background: #fff;
     position: relative;
-    /* -webkit-user-select: none;
+    -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    user-select: none; */
+    user-select: none;
   }
   td:not(:empty) {
     padding: 0.2em 1em;
@@ -208,17 +221,6 @@
 
   td.selected {
     background-color: rgba(75, 141, 241, 0.048);
-  }
-
-  .editable-cell {
-    position: absolute;
-    padding: 0.2em 1em;
-    border: 0;
-    background: none;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
   }
 
   .service {
