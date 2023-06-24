@@ -84,6 +84,7 @@ async function getTableData({ name, limit = null, offset = null, where = null })
   const stmt = db.prepare(sql);
   for (let row of stmt.iterate())
     result.push(Object.values(row));
+    console.log({result})
   return result;
 };
 

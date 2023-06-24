@@ -6,7 +6,10 @@
   let { tableData } = data;
 
   const parser = new Rows(
-    tableData.map((row) => row.map((value) => ({ selected: false, value })))
+    tableData.map((row) => row.map((value) => ({
+      selected: false,
+      editable: false,
+      value })))
   );
   let rows = parser.rows;
 
