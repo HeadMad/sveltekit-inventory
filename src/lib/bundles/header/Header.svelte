@@ -1,5 +1,5 @@
 <script>
-  import Headroom from "$lib/components/default/headroom/Headroom.svelte";
+  import Headroom from "$lib/components/headroom/Headroom.svelte";
   import menu from "$lib/menu";
   import { pin } from "$lib/store";
 

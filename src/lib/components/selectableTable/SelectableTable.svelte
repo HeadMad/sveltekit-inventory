@@ -6,6 +6,7 @@
   export let rows = [];
   let range = new Set();
   let start = [0, 0];
+  let isEditable = false;
   let state;
 
   /**
@@ -67,6 +68,10 @@
     const { col, row } = td.dataset;
     const cell = rows[Number(row)][Number(col)];
 
+    makeCellContentEditable(td, cell)
+  }
+
+  function makeCellContentEditable(td, cell) {
     cell.editable = true;
     td.contentEditable = true;
 
@@ -77,11 +82,13 @@
         cell.value = this.innerText;
         cell.editable = false;
         this.contentEditable = false;
+        isEditable = false;
         this.removeEventListener('keydown', onInputContenteditable);
       },
       { once: true }
     );
     cursorInEndForContentEditable(td);
+    isEditable = true;
   }
 
   function onInputContenteditable(event) {
@@ -147,9 +154,18 @@
   function onWindowKeydown(event) {
     if (event.code === 'Escape')
       deselectRange();
+
+    // if (event.code === 'Enter' && !isEditable && range.size) {
+    //   const td = document.querySelector('td.selected');
+    //   const {col, row} = td.dataset;
+    //   const cell = rows[Number(row)][Number(col)];
+      
+    //   makeCellContentEditable(td, cell);
+    // }
   }
 </script>
-<svelte:window on:keydown={onWindowKeydown}/>
+
+<svelte:window on:keydown={onWindowKeydown} />
 
 {#if rows.length}
   <table

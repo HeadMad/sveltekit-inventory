@@ -8,21 +8,9 @@
   $: if (opened === false) dispatch("close");
      else dispatch("open");
 
-  const windowKeyActions = {
-    Escape(event) {
-      opened = false;
-    },
-  };
-
-  function onWindowKeydown(event) {
-    const code = event.code;
-    if (code in windowKeyActions) windowKeyActions[code](event);
-  }
-
+ 
   export { opened, open, close };
 </script>
-
-<svelte:window on:keydown={onWindowKeydown} />
 
 {#if opened}
   <div class="modal">

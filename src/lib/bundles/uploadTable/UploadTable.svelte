@@ -1,6 +1,6 @@
 <script>
   import Table from "$lib/components/default/table/Table.svelte";
-  import Modal from "$lib/components/default/modal/Modal.svelte";
+  import Modal from "$lib/components/default/modal/modal.svelte";
   import Icon from "$lib/components/default/icon/Icon.svelte";
 
   let body = [];

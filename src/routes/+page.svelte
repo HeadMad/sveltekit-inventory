@@ -2,8 +2,8 @@
 // @ts-nocheck
 
   // import { query, path, fragment } from "svelte-pathfinder";
-  import Modal from "$lib/components/default/modal/Modal.svelte";
-  import Input from "$lib/components/default/input/Input.svelte";
+  import Modal from "$lib/components/modal/modal.svelte";
+  import Input from "$lib/components/input/Input.svelte";
   import {createRequest} from "$lib/api";
 
   import { title, pin } from "$lib/store.js";

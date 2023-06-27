@@ -1,7 +1,7 @@
 ## Usage
 ```html
 <script>
-  import Modal from '$lib/modal/Modal.svelte';
+  import Modal from '$lib/modal/modal.svelte';
   let win;
 </script>
 

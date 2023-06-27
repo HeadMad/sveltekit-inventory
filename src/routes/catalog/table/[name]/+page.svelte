@@ -1,6 +1,6 @@
 <script>
   import Rows from "$lib/plugins/Rows/Rows";
-  import SelectableTable from "$lib/components/test/selectableTable/SelectableTable.svelte";
+  import SelectableTable from "$lib/components/selectableTable/SelectableTable.svelte";
 
   export let data;
   let { tableData } = data;
@@ -45,7 +45,7 @@
       if (event.ctrlKey && !event.shiftKey)
       return clearTable();
 
-    } else if (event.code === "KeyI" && event.ctrlKey) {
+    } else if (event.code === "KeyI" && event.ctrlKey && !event.shiftKey) {
       return invertSelection();
     }
   }

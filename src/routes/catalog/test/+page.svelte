@@ -2,7 +2,7 @@
   import Uploader from "$lib/components/default/uploader/Uploader.svelte";
   import XLSXParser from "$lib/plugins/Rows/XLSXParser";
   import { pin } from "$lib/store";
-  import SelectableTable from "$lib/components/test/selectableTable/SelectableTable.svelte";
+  import SelectableTable from "$lib/components/selectableTable/SelectableTable.svelte";
 
 
   $: top = $pin ? "39px" : "0";
